@@ -1,0 +1,22 @@
+{
+    "name": "stanleysie/hk-img",
+    "description": "Handle image format conversion and compression.",
+    "type": "library",
+    "require": {
+        "php": "^7.2",
+        "aws/aws-sdk-php": "^3.300"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Stanleysie\\HkImg\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Stanley Sie",
+            "email": "swookon@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
