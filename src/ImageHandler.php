@@ -13,7 +13,7 @@ use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
 use \PDO as PDO;
 
-class HKImage
+class ImageHandler
 {
     /**
      * database
