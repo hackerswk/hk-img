@@ -39,7 +39,7 @@ class HKImage
      * @param int $targetHeight 
      * @return bool
      */
-    function resizeImage($originalImagePath, $resizedImagePath, $targetWidth, $targetHeight) {
+    public function resizeImage($originalImagePath, $resizedImagePath, $targetWidth, $targetHeight) {
         // 獲取原始圖片的尺寸和類型
         list($originalWidth, $originalHeight, $type) = getimagesize($originalImagePath);
     
@@ -92,7 +92,7 @@ class HKImage
      * @param int $quality
      * @return bool
      */
-    function compressImage($originalImagePath, $compressedImagePath, $quality) {
+    public function compressImage($originalImagePath, $compressedImagePath, $quality) {
         // 獲取圖片類型
         $type = exif_imagetype($originalImagePath);
     
@@ -130,7 +130,7 @@ class HKImage
      * @param string $outputImagePath
      * @return bool
      */
-    function convertToJpg($originalImagePath, $outputImagePath) {
+    public function convertToJpg($originalImagePath, $outputImagePath) {
         // 獲取原始圖片的類型
         $type = exif_imagetype($originalImagePath);
     
@@ -178,7 +178,7 @@ class HKImage
      * @param string $accessKeySecret
      * @return string
      */
-    function uploadToS3($filePath, $bucketName, $key, $region, $accessKeyId, $accessKeySecret) {
+    public function uploadToS3($filePath, $bucketName, $key, $region, $accessKeyId, $accessKeySecret) {
         $s3Client = new S3Client([
             'version' => 'latest',
             'region'  => $region,
