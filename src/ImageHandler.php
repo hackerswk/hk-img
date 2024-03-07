@@ -190,12 +190,12 @@ class ImageHandler
     
         try {
             $result = $s3Client->putObject([
-                'Bucket' => $bucketName,
-                'Key'    => $key,
+                'Bucket' => $bucketName,   // S3 桶名稱
+                'Key'    => $key,          // S3 中的物件名稱，例如 'folder/subfolder/filename'         
                 'SourceFile' => $filePath,
                 'ACL'    => 'public-read', // 根據需要設置
             ]);
-            return $result['ObjectURL']; // 返回文件URL
+            return $result['ObjectURL'];   // 返回文件URL
         } catch (AwsException $e) {
             // 處理錯誤
             echo $e->getMessage();
