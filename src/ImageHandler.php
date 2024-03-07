@@ -11,25 +11,9 @@ namespace Stanleysie\HkImg;
 
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;
-use \PDO as PDO;
 
 class ImageHandler
 {
-    /**
-     * database
-     *
-     * @var object
-     */
-    private $database;
-
-    /**
-     * initialize
-     */
-    public function __construct($db = null)
-    {
-        $this->database = $db;
-    }
-
     /**
      * Handle image size.
      *
