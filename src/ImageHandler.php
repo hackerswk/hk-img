@@ -178,6 +178,7 @@ class ImageHandler
                 'Key'    => $key,          // S3 中的物件名稱，例如 'folder/subfolder/filename'         
                 'SourceFile' => $filePath,
                 'ACL'    => 'public-read', // 根據需要設置
+                'CacheControl' => 'max-age=864000', // 設定 Cache-Control 頭部
             ]);
             return $result['ObjectURL'];   // 返回文件URL
         } catch (AwsException $e) {
