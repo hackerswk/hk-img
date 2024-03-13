@@ -51,13 +51,13 @@ class ImageHandler
         // 保存調整後的圖片
         switch ($type) {
             case IMAGETYPE_JPEG:
-                imagejpeg($resizedImage, $resizedImagePath);
+                imagejpeg($resizedImage, $resizedImagePath, 100);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $resizedImagePath);
+                imagepng($resizedImage, $resizedImagePath, 100);
                 break;
             case IMAGETYPE_GIF:
-                imagegif($resizedImage, $resizedImagePath);
+                imagegif($resizedImage, $resizedImagePath, 100);
                 break;
         }
     
