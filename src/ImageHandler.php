@@ -55,10 +55,10 @@ class ImageHandler
                 imagejpeg($resizedImage, $resizedImagePath, 100);
                 break;
             case IMAGETYPE_PNG:
-                imagepng($resizedImage, $resizedImagePath, 100);
+                imagepng($resizedImage, $resizedImagePath, 9);
                 break;
             case IMAGETYPE_GIF:
-                imagegif($resizedImage, $resizedImagePath, 100);
+                imagegif($resizedImage, $resizedImagePath);
                 break;
         }
 
