@@ -275,4 +275,39 @@ class ImageHandler
         return true;
     }
 
+    /**
+     * Remove object from S3 bucket.
+     *
+     * @param string $objectKey The key of the object to be removed.
+     * @param string $bucketName The name of the S3 bucket.
+     * @param string $region The AWS region of the S3 bucket.
+     * @param string $accessKeyId The AWS access key ID.
+     * @param string $accessKeySecret The AWS access key secret.
+     * @return bool Returns true if the object is successfully removed, otherwise false.
+     */
+    public function removeFromS3($objectKey, $bucketName, $region, $accessKeyId, $accessKeySecret)
+    {
+        $s3Client = new S3Client([
+            'version' => 'latest',
+            'region' => $region,
+            'credentials' => [
+                'key' => $accessKeyId,
+                'secret' => $accessKeySecret,
+            ],
+        ]);
+
+        try {
+            // 删除对象
+            $result = $s3Client->deleteObject([
+                'Bucket' => $bucketName,
+                'Key' => $objectKey,
+            ]);
+            return true;
+        } catch (AwsException $e) {
+            // 捕获异常并打印错误消息
+            echo $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
 }
