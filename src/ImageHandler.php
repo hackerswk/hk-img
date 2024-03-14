@@ -310,4 +310,42 @@ class ImageHandler
         }
     }
 
+    /**
+     * List objects in S3 bucket.
+     *
+     * @param string $bucketName The name of the S3 bucket.
+     * @param string $region The AWS region of the S3 bucket.
+     * @param string $accessKeyId The AWS access key ID.
+     * @param string $accessKeySecret The AWS access key secret.
+     * @param string|null $objectKey (Optional) The key of the object to list. If provided, only objects with keys matching this prefix will be returned.
+     * @return array|false Returns an array of objects in the bucket if successful, otherwise false.
+     */
+    public function listObjectsInS3($bucketName, $region, $accessKeyId, $accessKeySecret, $objectKey = null)
+    {
+        $s3Client = new S3Client([
+            'version' => 'latest',
+            'region' => $region,
+            'credentials' => [
+                'key' => $accessKeyId,
+                'secret' => $accessKeySecret,
+            ],
+        ]);
+
+        try {
+            // 列出物件
+            $params = [
+                'Bucket' => $bucketName,
+            ];
+            if ($objectKey !== null) {
+                $params['Prefix'] = $objectKey;
+            }
+            $result = $s3Client->listObjects($params);
+            return $result['Contents'];
+        } catch (AwsException $e) {
+            // 捕獲異常並打印錯誤消息
+            echo $e->getMessage() . "\n";
+            return false;
+        }
+    }
+
 }
