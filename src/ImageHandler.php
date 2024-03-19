@@ -361,7 +361,6 @@ class ImageHandler
      *                      - height: int The target height for resizing.
      *                      - obj_key: string The key of the object in S3.
      *                      - old_obj: string | null The key of the old object in S3 to be deleted.
-     *                      - obj_url: string The URL of the object after uploading to S3.
      * @return bool|string Returns the URL of the uploaded object on success, otherwise false.
      */
     public function imgUpload($bucketName, $region, $accessKeyId, $accessKeySecret, array $config)
