@@ -348,4 +348,52 @@ class ImageHandler
         }
     }
 
+    /**
+     * Upload image to S3 with resizing, compressing, and object deletion.
+     *
+     * @param string $bucketName The name of the S3 bucket.
+     * @param string $region The AWS region of the S3 bucket.
+     * @param string $accessKeyId The AWS access key ID.
+     * @param string $accessKeySecret The AWS access key secret.
+     * @param array $config The upload configuration containing:
+     *                      - temp_file: string The path to the temporary image file.
+     *                      - width: int The target width for resizing.
+     *                      - height: int The target height for resizing.
+     *                      - obj_key: string The key of the object in S3.
+     *                      - old_obj: string | null The key of the old object in S3 to be deleted.
+     *                      - obj_url: string The URL of the object after uploading to S3.
+     * @return bool|string Returns the URL of the uploaded object on success, otherwise false.
+     */
+    public function imgUpload($bucketName, $region, $accessKeyId, $accessKeySecret, array $config)
+    {
+        // Extract configuration parameters
+        $tempFile = $config['temp_file'];
+        $width = $config['width'];
+        $height = $config['height'];
+        $objKey = $config['obj_key'];
+        $oldObj = $config['old_obj'] ?? null;
+
+        // Resize the image
+        $resizedImagePath = sys_get_temp_dir() . '/' . uniqid('resized_image_') . '.jpg';
+        $this->resizeImageMaintainAspectRatio($tempFile, $resizedImagePath, $width, $height);
+
+        // Compress the image
+        $compressedImagePath = sys_get_temp_dir() . '/' . uniqid('compressed_image_') . '.jpg';
+        $this->compressImage($resizedImagePath, $compressedImagePath, 90);
+
+        // Remove the old object from S3 if provided
+        if ($oldObj) {
+            $this->removeFromS3($oldObj, $bucketName, $region, $accessKeyId, $accessKeySecret);
+        }
+
+        // Upload the new object to S3
+        $objectUrl = $this->uploadToS3($compressedImagePath, $bucketName, $objKey, $region, $accessKeyId, $accessKeySecret);
+
+        // Clean up temporary files
+        unlink($resizedImagePath);
+        unlink($compressedImagePath);
+
+        return $objectUrl ?: false;
+    }
+
 }
