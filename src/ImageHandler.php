@@ -372,9 +372,13 @@ class ImageHandler
         $objKey = $config['obj_key'];
         $oldObj = $config['old_obj'] ?? null;
 
+        // Convert the image
+        $convertImagePath = sys_get_temp_dir() . '/' . uniqid('convert_image_') . '.jpg';
+        $this->convertToJpg($tempFile, $convertImagePath);
+
         // Resize the image
         $resizedImagePath = sys_get_temp_dir() . '/' . uniqid('resized_image_') . '.jpg';
-        $this->resizeImageMaintainAspectRatio($tempFile, $resizedImagePath, $width, $height);
+        $this->resizeImageMaintainAspectRatio($convertImagePath, $resizedImagePath, $width, $height);
 
         // Compress the image
         $compressedImagePath = sys_get_temp_dir() . '/' . uniqid('compressed_image_') . '.jpg';
@@ -389,6 +393,7 @@ class ImageHandler
         $objectUrl = $this->uploadToS3($compressedImagePath, $bucketName, $objKey, $region, $accessKeyId, $accessKeySecret);
 
         // Clean up temporary files
+        unlink($convertImagePath);
         unlink($resizedImagePath);
         unlink($compressedImagePath);
 
