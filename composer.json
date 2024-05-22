@@ -3,7 +3,7 @@
     "description": "Handle image format conversion and compression.",
     "type": "library",
     "require": {
-        "php": "^7.2",
+        "php": "^7.2 || ^8.0",
         "aws/aws-sdk-php": "^3.300"
     },
     "license": "MIT",
