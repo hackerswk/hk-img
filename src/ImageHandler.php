@@ -374,30 +374,39 @@ class ImageHandler
 
         // Convert the image
         $convertImagePath = sys_get_temp_dir() . '/' . uniqid('convert_image_') . '.jpg';
-        $this->convertToJpg($tempFile, $convertImagePath);
+        if (!$this->convertToJpg($tempFile, $convertImagePath)) {
+            return false;
+        }
 
         // Resize the image
         $resizedImagePath = sys_get_temp_dir() . '/' . uniqid('resized_image_') . '.jpg';
-        $this->resizeImageMaintainAspectRatio($convertImagePath, $resizedImagePath, $width, $height);
+        if (!$this->resizeImageMaintainAspectRatio($convertImagePath, $resizedImagePath, $width, $height)) {
+            return false;
+        }
 
         // Compress the image
         $compressedImagePath = sys_get_temp_dir() . '/' . uniqid('compressed_image_') . '.jpg';
-        $this->compressImage($resizedImagePath, $compressedImagePath, 90);
+        if (!$this->compressImage($resizedImagePath, $compressedImagePath, 90)) {
+            return false;
+        }
 
         // Remove the old object from S3 if provided
-        if ($oldObj) {
-            $this->removeFromS3($oldObj, $bucketName, $region, $accessKeyId, $accessKeySecret);
+        if ($oldObj && !$this->removeFromS3($oldObj, $bucketName, $region, $accessKeyId, $accessKeySecret)) {
+            return false;
         }
 
         // Upload the new object to S3
         $objectUrl = $this->uploadToS3($compressedImagePath, $bucketName, $objKey, $region, $accessKeyId, $accessKeySecret);
+        if (!$objectUrl) {
+            return false;
+        }
 
         // Clean up temporary files
         unlink($convertImagePath);
         unlink($resizedImagePath);
         unlink($compressedImagePath);
 
-        return $objectUrl ?: false;
+        return $objectUrl;
     }
 
 }
