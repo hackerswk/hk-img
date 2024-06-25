@@ -141,7 +141,7 @@ class ImageHandler
                 $image = imagecreatefrombmp($originalImagePath);
                 break;
             default:
-                echo "不支持的圖片格式";
+                //echo "不支持的圖片格式";
                 return false;
         }
 
