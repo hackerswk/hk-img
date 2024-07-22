@@ -90,6 +90,8 @@ class ImageHandler
                 break;
             case IMAGETYPE_PNG:
                 $image = imagecreatefrompng($originalImagePath);
+                // 保存透明度
+                imagesavealpha($image, true);
                 // PNG的質量參數範圍是0（無壓縮）到9
                 $pngQuality = ($quality - 100) / 11.111111;
                 $pngQuality = round(abs($pngQuality));
