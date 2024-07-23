@@ -9,8 +9,7 @@
 
 namespace Stanleysie\HkImg;
 
-use Aws\Exception\AwsException;
-use Aws\S3\S3Client;
+use Jeffho\HkAwsS3\AWSS3Handler;
 
 class ImageHandler
 {
@@ -157,44 +156,6 @@ class ImageHandler
     }
 
     /**
-     * Handle upload to s3.
-     *
-     * @param string $filePath
-     * @param string $bucketName
-     * @param int $key
-     * @param string $region
-     * @param string $accessKeyId
-     * @param string $accessKeySecret
-     * @return string
-     */
-    public function uploadToS3($filePath, $bucketName, $key, $region, $accessKeyId, $accessKeySecret)
-    {
-        $s3Client = new S3Client([
-            'version' => 'latest',
-            'region' => $region,
-            'credentials' => [
-                'key' => $accessKeyId,
-                'secret' => $accessKeySecret,
-            ],
-        ]);
-
-        try {
-            $result = $s3Client->putObject([
-                'Bucket' => $bucketName, // S3 桶名稱
-                'Key' => $key, // S3 中的物件名稱，例如 'folder/subfolder/filename'
-                'SourceFile' => $filePath,
-                'ACL' => 'public-read', // 根據需要設置
-                'CacheControl' => 'max-age=864000', // 設定 Cache-Control 頭部
-            ]);
-            return $result['ObjectURL']; // 返回文件URL
-        } catch (AwsException $e) {
-            // 處理錯誤
-            echo $e->getMessage();
-            return null;
-        }
-    }
-
-    /**
      * Resize image while maintaining aspect ratio.
      *
      * @param string $originalImagePath The path to the original image.
@@ -278,79 +239,6 @@ class ImageHandler
     }
 
     /**
-     * Remove object from S3 bucket.
-     *
-     * @param string $objectKey The key of the object to be removed.
-     * @param string $bucketName The name of the S3 bucket.
-     * @param string $region The AWS region of the S3 bucket.
-     * @param string $accessKeyId The AWS access key ID.
-     * @param string $accessKeySecret The AWS access key secret.
-     * @return bool Returns true if the object is successfully removed, otherwise false.
-     */
-    public function removeFromS3($objectKey, $bucketName, $region, $accessKeyId, $accessKeySecret)
-    {
-        $s3Client = new S3Client([
-            'version' => 'latest',
-            'region' => $region,
-            'credentials' => [
-                'key' => $accessKeyId,
-                'secret' => $accessKeySecret,
-            ],
-        ]);
-
-        try {
-            // 删除对象
-            $result = $s3Client->deleteObject([
-                'Bucket' => $bucketName,
-                'Key' => $objectKey,
-            ]);
-            return true;
-        } catch (AwsException $e) {
-            // 捕获异常并打印错误消息
-            echo $e->getMessage() . "\n";
-            return false;
-        }
-    }
-
-    /**
-     * List objects in S3 bucket.
-     *
-     * @param string $bucketName The name of the S3 bucket.
-     * @param string $region The AWS region of the S3 bucket.
-     * @param string $accessKeyId The AWS access key ID.
-     * @param string $accessKeySecret The AWS access key secret.
-     * @param string|null $objectKey (Optional) The key of the object to list. If provided, only objects with keys matching this prefix will be returned.
-     * @return array|false Returns an array of objects in the bucket if successful, otherwise false.
-     */
-    public function listObjectsInS3($bucketName, $region, $accessKeyId, $accessKeySecret, $objectKey = null)
-    {
-        $s3Client = new S3Client([
-            'version' => 'latest',
-            'region' => $region,
-            'credentials' => [
-                'key' => $accessKeyId,
-                'secret' => $accessKeySecret,
-            ],
-        ]);
-
-        try {
-            // 列出物件
-            $params = [
-                'Bucket' => $bucketName,
-            ];
-            if ($objectKey !== null) {
-                $params['Prefix'] = $objectKey;
-            }
-            $result = $s3Client->listObjects($params);
-            return $result['Contents'];
-        } catch (AwsException $e) {
-            // 捕獲異常並打印錯誤消息
-            echo $e->getMessage() . "\n";
-            return false;
-        }
-    }
-
-    /**
      * Upload image to S3 with resizing, compressing, and object deletion.
      *
      * @param string $bucketName The name of the S3 bucket.
@@ -392,14 +280,12 @@ class ImageHandler
             return false;
         }
 
-        // Remove the old object from S3 if provided
-        if ($oldObj && !$this->removeFromS3($oldObj, $bucketName, $region, $accessKeyId, $accessKeySecret)) {
-            return false;
-        }
-
+        // Set AWS Client
+        $AWSS3Handler = new AWSS3Handler();
+        $client = $AWSS3Handler->setClient($region, $accessKeyId, $accessKeySecret);
         // Upload the new object to S3
-        $objectUrl = $this->uploadToS3($compressedImagePath, $bucketName, $objKey, $region, $accessKeyId, $accessKeySecret);
-        if (!$objectUrl) {
+        $result = $AWSS3Handler->putObject($client, $bucketName, $objKey, $compressedImagePath);
+        if ($result->status == 'failure') {
             return false;
         }
 
