@@ -294,7 +294,7 @@ class ImageHandler
         unlink($resizedImagePath);
         unlink($compressedImagePath);
 
-        return $objectUrl;
+        return $result->object;
     }
 
 }
