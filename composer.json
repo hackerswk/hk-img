@@ -4,7 +4,7 @@
     "type": "library",
     "require": {
         "php": "^7.2 || ^8.0",
-        "aws/aws-sdk-php": "^3.300"
+        "aws/aws-sdk-php": "3.277"
     },
     "license": "MIT",
     "autoload": {
